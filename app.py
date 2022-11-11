@@ -235,9 +235,9 @@ def get_user_info_data(code,token):
     data_getinfo = str(data_getinfo)
     stunum = requests.post(url=url,headers=header,data=data_getinfo).text
     stunum = json.loads(stunum)
-    stunum = stunum['stuNumber']
-    stuNum = str(stunum)
-    return stuNum
+    stuNum = stunum['stuNumber']
+    stuName = stunum['stuName']
+    return stuNum,stuName
 
 class Location:
     def __init__(self, locationArray):
@@ -487,45 +487,45 @@ def morning_data(stunum,token):
     data = re.findall(reg, data)
     return data
 
-@app.route('/')
-def index():
-    index_page()
-    return index_page()
+# @app.route('/')
+# def index():
+#     index_page()
+#     return index_page()
 
-@app.route('/check',methods = ['GET','POST'])
-def check_sword():
-    list = []
-    if request.method == 'POST':
-        Token = request.form.get('sword')
-        Token = str(Token)
-        if len(Token) != 15:
-            return "令牌错误"
-        else:
-            with open("token.txt")as r:
-                for line in r:
-                    list.append(line.strip())
-        if Token in list:
-            list = []
-            with open("token.txt") as f:
-                for line in f:
-                    list.append(line.strip())
-            a = list.index(Token)
-            list.pop(a)
-            # print(list)
-            with open('token.txt', 'w') as fp:
-                [fp.write(str(item) + '\n') for item in list]
-                fp.close()
-            return """<center>令牌正确<br><form action="/sub" method="POST"><br><p><input type="submit"></p><br><h2>点提交开始fuck龙猫</h2>"""
+# @app.route('/check',methods = ['GET','POST'])
+# def check_sword():
+#     list = []
+#     if request.method == 'POST':
+#         Token = request.form.get('sword')
+#         Token = str(Token)
+#         if len(Token) != 15:
+#             return "令牌错误"
+#         else:
+#             with open("token.txt")as r:
+#                 for line in r:
+#                     list.append(line.strip())
+#         if Token in list:
+#             list = []
+#             with open("token.txt") as f:
+#                 for line in f:
+#                     list.append(line.strip())
+#             a = list.index(Token)
+#             list.pop(a)
+#             # print(list)
+#             with open('token.txt', 'w') as fp:
+#                 [fp.write(str(item) + '\n') for item in list]
+#                 fp.close()
+#             return """<center>令牌正确<br><form action="/sub" method="POST"><br><p><input type="submit"></p><br><h2>点提交开始fuck龙猫</h2>"""
 
-@app.route('/sub_morning')
-def sub_morning():
-    a = getaccesstoken()
-    b = geticket(a)
-    c = getqrcode(b)
-    global uid_gobal
-    uid_gobal = c[1]
-    # get_code(c[1])
-    return kepp_qrimg_morning(c[0], c[1])
+# @app.route('/sub_morning')
+# def sub_morning():
+#     a = getaccesstoken()
+#     b = geticket(a)
+#     c = getqrcode(b)
+#     global uid_gobal
+#     uid_gobal = c[1]
+#     # get_code(c[1])
+#     return kepp_qrimg_morning(c[0], c[1])
 
 @app.route('/fuck_morning')
 def fuck_morning():
@@ -567,10 +567,10 @@ def fuck_morning():
     res_morning = requests.post(url=url_morning,headers=header,data=data)
     return res_morning.text
 
-@app.route('/sub',methods = ['GET','POST'])
+@app.route('/',methods = ['GET','POST'])
 def action():  # put application's code here
-    if request.method == 'GET':
-        return redirect(url_for('index'))
+    # if request.method == 'GET':
+    #     return redirect(url_for('index'))
     # if request.method == 'POST':
     #     data = request.form.get('data')
     a = getaccesstoken()
@@ -585,6 +585,7 @@ def action():  # put application's code here
 def action_getcode():
     from flask import request
     import re
+    import datetime
     if request.method == 'GET':
         global uid_gobal
         uid = uid_gobal
@@ -616,10 +617,21 @@ def action_getcode():
         """
         以上获取token
         """
-        stuNum = get_user_info_data(code_,token)
-        stuNum = str(stuNum)
-        res = get_run_post_data(stuNum,token)
-        return res
+        stu_info_list = get_user_info_data(code_,token)
+        stuNum = str(stu_info_list[0])
+        stuName = str(stu_info_list[1])
+
+        f = open("token.txt", 'r')
+        info_list = f.read().splitlines()
+        if stuNum in info_list:
+            res = get_run_post_data(stuNum,token)
+            return res
+        else:
+            time = datetime.datetime.now()
+            time = time.strftime('%Y-%m-%d %H:%M:%S')
+            g = open('hack.txt','a',encoding='utf-8')
+            g.write(f"{stuName} {stuNum} {time}\n")
+            return "<h1>fuck_you_还tm想代跑呢<h1>"
 
 if __name__ == '__main__':
     app.run()

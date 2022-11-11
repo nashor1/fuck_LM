@@ -2,14 +2,165 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>Flask Show Image</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fuck_longmao</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+        }
+        .container {
+            height: 100%;
+            background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        }
+        .login-wrapper {
+            background-color: #fff;
+            width: 358px;
+            height: 588px;
+            border-radius: 15px;
+            padding: 0 50px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .header {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 200px;
+        }
+        .input-item {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 0;
+            padding: 10px;
+            border-bottom: 1px solid rgb(128, 125, 125);
+            font-size: 15px;
+            outline: none;
+        }
+        .input-item:placeholder {
+            text-transform: uppercase;
+        }
+        .btn {
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            margin-top: 40px;
+            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
+            color: #fff;
+        }
+        .msg {
+            text-align: center;
+            line-height: 88px;
+        }
+        a {
+            text-decoration-line: none;
+            color: #abc1ee;
+        }
+        @keyframes move {
+            0% {
+                background-position: 0%;
+            }
+            100% {
+                background-position: 100%;
+            }
+        }
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        body {
+            background-color: black;
+            cursor: url(./nashor.jpg),auto;
+        }
+        .box {
+            width: 200px;
+            height: 200px;
+            margin: 50px auto;
+        }
+        .btn {
+            position: relative;
+            width: 150px;
+            height: 55px;
+            color: white;
+            line-height: 30px;
+            font-size: 20px;
+            font-family: sans-serif;
+            text-transform: uppercase;//转为大写字母
+            text-align: center;
+            border-radius: 40px;
+            background: linear-gradient(90deg,rgb(242, 97, 94),rgb(234, 150, 104),rgb(251, 200, 2),rgb(174, 9, 43),rgb(108, 40, 243),rgb(212, 4, 128),rgb(85, 132, 206));
+            background-size: 400%;
+            border: none;
+            outline: none;
+            text-shadow: 0 0 3px white,
+                         0 0 3px white,
+                         0 0 3px white;
+            z-index: 1;
+        }
+        .btn:hover {
+            animation: move 2s linear alternate infinite;
+        }
+        .btn::before {
+            content: '';
+            position: absolute;
+            top: -5px;
+            left: -5px;
+            width: 155px;
+            height: 60px;
+            background: linear-gradient(90deg,rgb(242, 97, 94),rgb(234, 150, 104),rgb(251, 200, 2),rgb(174, 9, 43),rgb(108, 40, 243),rgb(212, 4, 128),rgb(85, 132, 206));
+            background-size: 200%;
+            opacity: 0;
+            border-radius: 45px;
+            transition: .6s;
+            z-index: -1;
+        }
+        .btn:hover::before {
+            filter: blur(10px);
+            opacity: 1;
+            animation: move 2s linear alternate infinite;
+        }
+
+    </style>
+
+
 </head>
-<center>
 <body>
+<div class="container">
+<center>
+    <div style="FONT-SIZE: 45pt; FILTER: shadow(color=0000FF); COLOR: #ff0000; HEIGHT: 25px"><strong>服务器12月过期会更新网址，加群加群加群</font></div>
+    <br>
+    <br>
+    <br>
+    <br>
+<h2>欢迎使用fuck_longmao</h2>
     <img style="width:180px" src="data:;base64,{{ img_stream }}">
     <br>
-<a href="/fuck">授权后点我提交</a>
+<a href="/fuck" style='color:yellow'>
+    <button class="btn">阳光跑提交</button>
+</a>
+<a href="/fuck_morning" style='color:yellow'>
+    <button class="btn">早操签到提交</button>
+</a>
+
+<h4>注意：获取的二维码只能用另一个设备打开才能扫码，不能保存二维码用微信识别，否则会失败</h4>
+    <h3>qq群：603014308</h3>
+    <a style="color: red">提交失败请刷新页面重试，出现bug请加群联系群主</a>
+
+
+
+
 </center>
+
+</div>
 </body>
 
 </html>

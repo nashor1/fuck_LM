@@ -2,22 +2,97 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>fuck_morning</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>fuck_longmao</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+        }
+        html {
+            height: 100%;
+        }
+        body {
+            height: 100%;
+        }
+        .container {
+            height: 100%;
+            background-image: linear-gradient(to right, #fbc2eb, #a6c1ee);
+        }
+        .login-wrapper {
+            background-color: #fff;
+            width: 358px;
+            height: 588px;
+            border-radius: 15px;
+            padding: 0 50px;
+            position: relative;
+            left: 50%;
+            top: 50%;
+            transform: translate(-50%, -50%);
+        }
+        .header {
+            font-size: 38px;
+            font-weight: bold;
+            text-align: center;
+            line-height: 200px;
+        }
+        .input-item {
+            display: block;
+            width: 100%;
+            margin-bottom: 20px;
+            border: 0;
+            padding: 10px;
+            border-bottom: 1px solid rgb(128, 125, 125);
+            font-size: 15px;
+            outline: none;
+        }
+        .input-item:placeholder {
+            text-transform: uppercase;
+        }
+        .btn {
+            text-align: center;
+            padding: 10px;
+            width: 100%;
+            margin-top: 40px;
+            background-image: linear-gradient(to right, #a6c1ee, #fbc2eb);
+            color: #fff;
+        }
+        .msg {
+            text-align: center;
+            line-height: 88px;
+        }
+        a {
+            text-decoration-line: none;
+            color: #abc1ee;
+        }
+    </style>
 </head>
-<center>
 <body>
-    <h1>longmao远程早晨签到</h1>
-<img style="width:180px" src="data:;base64,{{ img_stream }}">
+<div class="container">
+<center>
+
+<form action="/check" method="post">
+  <h2>欢迎使用fuck_longmao</h2>
+
+    <p>输入令牌：<input type="text" name="sword"></p>
+    <p>
+    <input type="submit">
+    <input type="reset">
+    </p>
+</form>
+<a href="http://101.43.119.83:8000" style='color:yellow'>点这里购买令牌</a>
+    <h3>qq群：603014308</h3>
     <br>
-<a href="/fuck_morning">授权后点我提交</a>
+    <h5>q群每天发3个免费卡密</h5>
 <br>
-    <h2>注意：本项目仅支持在规定时间内签到06:30——07:20，你们还是得早起，嘻嘻~</h2>
-<p>如出现异常请刷新页面再次扫码提交，遇到bug请加q群联系群主</p>
-<p>q群：603014308</p>
-<p>技术支持：Maple,Nashor_1,MengTL</p>
-
-<a href="/">点击阳光跑直达链接</a>
+<h4>注意：获取的二维码只能用另一个设备打开才能扫码，不能保存二维码用微信识别，否则会失败</h4>
+<a href="/sub_morning" style='color:yellow'>点我免费早操签到</a>
 </center>
-</body>
+<marquee direction="up" behavior="scroll" scrollamount="1" onmouseover="this.stop();" onmouseout="this.start();" scrolldelay="0" loop="-1" width="300" height="225" bgcolor="red">
 
+                这台服务器12月过期，想继续用的加群加群
+
+        </marquee>
+    </div>
+</body>
 </html>
