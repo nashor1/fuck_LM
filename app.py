@@ -4,7 +4,9 @@ import random
 import requests
 from flask import Flask, request, redirect, url_for
 import BaseConfig as CONSTANT
-
+"""
+pycryptodome
+"""
 app = Flask(__name__)
 uid_gobal = ""
 pub_key_str = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDU/j+c5FdkEwhSIF9jmw+050iN0/yfjhk/669RyFiG5wu0Adpk3NR2Ikbo2lA+rTBJBx1bpGVGCvMKKQ/pljNUSmJtJaM5ieONFrZD6RhSUbjrNENH89Ks9GGWi+1dkOfdSHNujQilF5oLOIHez1HYmwmlADA29Ux4yb8e4+PtLQIDAQAB\n-----END PUBLIC KEY-----"
@@ -112,30 +114,34 @@ polist_1 = [{
                 "latitude": "31.580526"
             }]
 token_list = []
-def getaccesstoken():
-    url = 'https://api.weixin.qq.com/cgi-bin/token'
-    params = {
-        'grant_type': 'client_credential',
-        'appid': 'wx20976a32c7a2fd75',
-        'secret': '1f93042373d4622442e884bbc5dec74e'
-    }
-    accesstoken = requests.get(url=url, params=params)
-    accesstoken = accesstoken.text
-    accesstoken = json.loads(accesstoken)
-    accesstoken = accesstoken['access_token']
-    return accesstoken
 
-def geticket(getaccesstoken):
-    url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket'
-    params = {
-        'access_token': getaccesstoken,
-        'type': 2
-    }
-    ticket = requests.get(url=url, params=params)
-    ticket = ticket.text
-    ticket = json.loads(ticket)
-    ticket = ticket['ticket']
-    return ticket
+def geticket():
+    while True:
+        with open('accesstoken.txt', 'r') as f:
+            getaccesstoken = f.read()
+        url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket'
+        params = {
+            'access_token': getaccesstoken,
+            'type': 2
+        }
+        res = requests.get(url=url, params=params).json()
+        errcode = res['errcode']
+        if errcode != 0:
+            url = 'https://api.weixin.qq.com/cgi-bin/token'
+            params = {
+                'grant_type': 'client_credential',
+                'appid': 'wx20976a32c7a2fd75',
+                'secret': '1f93042373d4622442e884bbc5dec74e'
+            }
+            accesstoken = requests.get(url=url, params=params).json()
+            accesstoken = accesstoken['access_token']
+
+            with open('accesstoken.txt', 'w') as f:
+                f.write(accesstoken)
+        else:
+            geticket = res['ticket']
+            break
+    return geticket
 
 def getqrcode(geticket):
     import uuid
@@ -561,8 +567,8 @@ def fuck_morning():
     """
     以上获取token
     """
-    stuNum = get_user_info_data(code_, token)
-    stuNum = str(stuNum)
+    stu_info_list = get_user_info_data(code_, token)
+    stuNum = str(stu_info_list[0])
     data = str(morning_data(stuNum,token))
     res_morning = requests.post(url=url_morning,headers=header,data=data)
     return res_morning.text
@@ -573,8 +579,7 @@ def action():  # put application's code here
     #     return redirect(url_for('index'))
     # if request.method == 'POST':
     #     data = request.form.get('data')
-    a = getaccesstoken()
-    b = geticket(a)
+    b = geticket()
     c = getqrcode(b)
     global uid_gobal
     uid_gobal = c[1]
@@ -623,15 +628,8 @@ def action_getcode():
 
         f = open("token.txt", 'r')
         info_list = f.read().splitlines()
-        if stuNum in info_list:
-            res = get_run_post_data(stuNum,token)
-            return res
-        else:
-            time = datetime.datetime.now()
-            time = time.strftime('%Y-%m-%d %H:%M:%S')
-            g = open('hack.txt','a',encoding='utf-8')
-            g.write(f"{stuName} {stuNum} {time}\n")
-            return "<h1>fuck_you_还tm想代跑呢<h1>"
+        res = get_run_post_data(stuNum, token)
+        return res
 
 if __name__ == '__main__':
     app.run()
