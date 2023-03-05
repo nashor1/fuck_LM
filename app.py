@@ -624,10 +624,9 @@ def action_getcode():
         """
         stu_info_list = get_user_info_data(code_,token)
         stuNum = str(stu_info_list[0])
-        stuName = str(stu_info_list[1])
+        # stuName = str(stu_info_list[1])#用于记录用过这个项目跑步人员名字，需要使用的时候再修改
 
-        f = open("token.txt", 'r')
-        info_list = f.read().splitlines()
+
         res = get_run_post_data(stuNum, token)
         return res
 
