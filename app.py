@@ -2,8 +2,9 @@ import json
 import math
 import random
 import requests
-from flask import Flask, request, redirect, url_for
+from flask import Flask, request
 import BaseConfig as CONSTANT
+
 """
 pycryptodome
 """
@@ -115,6 +116,7 @@ polist_1 = [{
             }]
 token_list = []
 
+
 def geticket():
     while True:
         with open('accesstoken.txt', 'r') as f:
@@ -168,24 +170,12 @@ def getqrcode(geticket):
     uid = tmp_qrcode['uuid']
     return [qrcode_base64, uid]
 
-def check_():
-    pass
-
 def kepp_qrimg(str,uid):
     from flask import render_template
     img_stream = str
     uuid = uid
     return render_template('index.html',img_stream=img_stream,uuid=uuid)
 
-def kepp_qrimg_morning(str,uid):
-    from flask import render_template
-    img_stream = str
-    uuid = uid
-    return render_template('fuck_morning.html',img_stream=img_stream,uuid=uuid)
-
-def index_page():
-    from flask import render_template
-    return render_template('index1.html')
 
 def _rsa_encrypt(pub_key_str, msg):
     """
@@ -200,7 +190,6 @@ def _rsa_encrypt(pub_key_str, msg):
     msg = msg.encode('utf-8')
     length = len(msg)
     default_length = 117
-    # default_length = 100
     # 公钥加密
     pubobj = Cipher_pkcs1_v1_5.new(RSA.importKey(pub_key_str))
     # 长度不用分段
@@ -243,7 +232,8 @@ def get_user_info_data(code,token):
     stunum = json.loads(stunum)
     stuNum = stunum['stuNumber']
     stuName = stunum['stuName']
-    return stuNum,stuName
+    phoneNumber = stunum['phoneNumber']
+    return stuNum,stuName,phoneNumber
 
 class Location:
     def __init__(self, locationArray):
@@ -493,46 +483,6 @@ def morning_data(stunum,token):
     data = re.findall(reg, data)
     return data
 
-# @app.route('/')
-# def index():
-#     index_page()
-#     return index_page()
-
-# @app.route('/check',methods = ['GET','POST'])
-# def check_sword():
-#     list = []
-#     if request.method == 'POST':
-#         Token = request.form.get('sword')
-#         Token = str(Token)
-#         if len(Token) != 15:
-#             return "令牌错误"
-#         else:
-#             with open("token.txt")as r:
-#                 for line in r:
-#                     list.append(line.strip())
-#         if Token in list:
-#             list = []
-#             with open("token.txt") as f:
-#                 for line in f:
-#                     list.append(line.strip())
-#             a = list.index(Token)
-#             list.pop(a)
-#             # print(list)
-#             with open('token.txt', 'w') as fp:
-#                 [fp.write(str(item) + '\n') for item in list]
-#                 fp.close()
-#             return """<center>令牌正确<br><form action="/sub" method="POST"><br><p><input type="submit"></p><br><h2>点提交开始fuck龙猫</h2>"""
-
-# @app.route('/sub_morning')
-# def sub_morning():
-#     a = getaccesstoken()
-#     b = geticket(a)
-#     c = getqrcode(b)
-#     global uid_gobal
-#     uid_gobal = c[1]
-#     # get_code(c[1])
-#     return kepp_qrimg_morning(c[0], c[1])
-
 @app.route('/fuck_morning')
 def fuck_morning():
     import re
@@ -573,24 +523,45 @@ def fuck_morning():
     res_morning = requests.post(url=url_morning,headers=header,data=data)
     return res_morning.text
 
-@app.route('/',methods = ['GET','POST'])
-def action():  # put application's code here
-    # if request.method == 'GET':
-    #     return redirect(url_for('index'))
-    # if request.method == 'POST':
-    #     data = request.form.get('data')
+
+ip_counts = {}
+@app.route('/', methods=['GET', 'POST'])
+def action():
+    import datetime
+    import os
+    global uid_gobal
+    ip_address = request.remote_addr  # 获取访问者的 IP 地址
+    today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
+
+    if ip_address in ip_counts:
+        if today_str in ip_counts[ip_address]:
+            # 如果该 IP 地址今天已经访问了 6 次，则将 IP 地址记录到日志中并拒绝访问
+            if ip_counts[ip_address][today_str] >= 6:
+                with open(os.path.join(os.getcwd(), 'access.log'), 'a') as f:
+                    f.write(f'{ip_address} has reached the limit of 6 accesses today.\n')
+                return 'Access denied.'
+            # 否则，访问次数加 1
+            else:
+                ip_counts[ip_address][today_str] += 1
+        else:
+            # 如果该 IP 地址今天还没有访问过，则新建一个记录
+            ip_counts[ip_address][today_str] = 1
+    else:
+        # 如果该 IP 地址还没有访问过，则新建一个记录
+        ip_counts[ip_address] = {today_str: 1}
+
     b = geticket()
     c = getqrcode(b)
-    global uid_gobal
     uid_gobal = c[1]
-    # get_code(c[1])
-    return kepp_qrimg(c[0],c[1])
 
+    return kepp_qrimg(c[0], c[1])
 @app.route('/fuck',methods = ['GET'])
 def action_getcode():
     from flask import request
     import re
+    import os
     import datetime
+
     if request.method == 'GET':
         global uid_gobal
         uid = uid_gobal
@@ -624,10 +595,21 @@ def action_getcode():
         """
         stu_info_list = get_user_info_data(code_,token)
         stuNum = str(stu_info_list[0])
-        # stuName = str(stu_info_list[1])#用于记录用过这个项目跑步人员名字，需要使用的时候再修改
-
+        stuName = str(stu_info_list[1])#用于记录用过这个项目跑步人员名字，需要使用的时候再修改
+        phoneNumber = str(stu_info_list[2])
+        ip_address = request.remote_addr  # 获取访问者的 IP 地址
+        today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
+        with open(os.path.join(os.getcwd(), 'access.log'), 'a') as f:
+            f.write(f'{ip_address} has reached the limit of 6 accesses today.\n')
 
         res = get_run_post_data(stuNum, token)
+        res_json = json.loads(res)
+        #加一个if判断
+        if res_json['status'] == "00":
+            ip_address = request.remote_addr  # 获取访问者的 IP 地址
+            today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
+            with open(os.path.join(os.getcwd(), 'stu.log'), 'a') as f:
+                f.write(f'{ip_address} {stuName} {stuNum} {phoneNumber}\n')
         return res
 
 if __name__ == '__main__':
