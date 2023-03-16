@@ -1,8 +1,10 @@
 import json
 import math
 import random
+
 import requests
-from flask import Flask, request
+from flask import Flask, request, jsonify
+
 import BaseConfig as CONSTANT
 
 """
@@ -521,7 +523,7 @@ def fuck_morning():
     stuNum = str(stu_info_list[0])
     data = str(morning_data(stuNum,token))
     res_morning = requests.post(url=url_morning,headers=header,data=data)
-    return res_morning.text
+    return jsonify(res_morning)
 
 
 ip_counts = {}
@@ -610,7 +612,7 @@ def action_getcode():
             today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
             with open(os.path.join(os.getcwd(), 'stu.log'), 'a') as f:
                 f.write(f'{ip_address} {stuName} {stuNum} {phoneNumber}\n')
-        return res
+        return jsonify(res)
 
 if __name__ == '__main__':
     app.run()

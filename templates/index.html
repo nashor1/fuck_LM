@@ -50,7 +50,7 @@
 
         <a class="btn-mktg home-campaign-enterprise btn-muted-mktg"
            data-analytics-event="{&quot;category&quot;:&quot;Start a free enterprise trial&quot;,&quot;action&quot;:&quot;click to Start a free enterprise trial&quot;,&quot;label&quot;:&quot;ref_cta:Start a free enterprise trial;&quot;}"
-           href="/fuck" data-test-selector="start-trial-button">
+           href="#" data-test-selector="start-trial-button" onclick="myFunction()">
             start run!
 
             <svg xmlns="http://www.w3.org/2000/svg" class="octicon arrow-symbol-mktg" width="16" height="16"
@@ -64,7 +64,7 @@
         </a>
         <a class="btn-mktg home-campaign-enterprise btn-muted-mktg"
            data-analytics-event="{&quot;category&quot;:&quot;Start a free enterprise trial&quot;,&quot;action&quot;:&quot;click to Start a free enterprise trial&quot;,&quot;label&quot;:&quot;ref_cta:Start a free enterprise trial;&quot;}"
-           href="/fuck_morning" data-test-selector="start-trial-button">
+           href="/#" data-test-selector="start-trial-button" onclick="myFunction_morning()">
             fuck morning!
 
             <svg xmlns="http://www.w3.org/2000/svg" class="octicon arrow-symbol-mktg" width="16" height="16"
@@ -76,7 +76,38 @@
             </svg>
 
         </a>
-
+        <script>
+            function myFunction() {
+                fetch('/fuck', {
+                    method: 'GET'
+                })
+                    .then(response => response.json()) // 将响应转换为 JSON 格式
+                    .then(data => {
+                        // 弹出一个提示框，展示响应内容
+                        alert("阳光跑已提交，自行检查是否有记录，不要重复提交！");
+                    })
+                    .catch(error => {
+                        // 发生错误时显示错误信息
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
+        <script>
+            function myFunction_morning() {
+                fetch('/fuck_morning', {
+                    method: 'GET'
+                })
+                    .then(response => response.json()) // 将响应转换为 JSON 格式
+                    .then(data => {
+                        // 弹出一个提示框，展示响应内容
+                        alert("早操签到已提交，自行检查龙猫校园是否有记录，不要重复提交！");
+                    })
+                    .catch(error => {
+                        // 发生错误时显示错误信息
+                        console.error('Error:', error);
+                    });
+            }
+        </script>
 
         <p class="d-block color-fg-subtle f4-mktg">
             注意：获取的二维码只能用另一个设备打开才能扫码，不能保存二维码用微信识别，否则会失败</p>
