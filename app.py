@@ -1,9 +1,18 @@
+import base64
+import datetime
+import hashlib
 import json
 import math
+import os
 import random
+import re
+import time
+import uuid
 
 import requests
-from flask import Flask, request, jsonify
+from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcs1_v1_5
+from Crypto.PublicKey import RSA
+from flask import Flask, jsonify
 
 import BaseConfig as CONSTANT
 
@@ -14,169 +23,200 @@ app = Flask(__name__)
 uid_gobal = ""
 pub_key_str = "-----BEGIN PUBLIC KEY-----\nMIGfMA0GCSqGSIb3DQEBAQUAA4GNADCBiQKBgQDU/j+c5FdkEwhSIF9jmw+050iN0/yfjhk/669RyFiG5wu0Adpk3NR2Ikbo2lA+rTBJBx1bpGVGCvMKKQ/pljNUSmJtJaM5ieONFrZD6RhSUbjrNENH89Ks9GGWi+1dkOfdSHNujQilF5oLOIHez1HYmwmlADA29Ux4yb8e4+PtLQIDAQAB\n-----END PUBLIC KEY-----"
 header = {
-        'Content-Type': 'application/json; charset=utf-8',
-        'Accept-Encoding': 'gzip, deflate',
-        'User-Agent': 'okhttp/4.9.0'
-    }
+    'Content-Type': 'application/json; charset=utf-8',
+    'Accept-Encoding': 'gzip, deflate',
+    'User-Agent': 'okhttp/4.9.0'
+}
 polist = [{
-                "longitude": "120.468194",
-                "latitude": "31.580517"
-            }, {
-                "longitude": "120.468287",
-                "latitude": "31.580629"
-            }, {
-                "longitude": "120.468387",
-                "latitude": "31.58065"
-            }, {
-                "longitude": "120.468703",
-                "latitude": "31.580654"
-            }, {
-                "longitude": "120.46887",
-                "latitude": "31.580656"
-            }, {
-                "longitude": "120.468973",
-                "latitude": "31.580478"
-            }, {
-                "longitude": "120.468967",
-                "latitude": "31.580153"
-            }, {
-                "longitude": "120.468967",
-                "latitude": "31.579732"
-            }, {
-                "longitude": "120.468951",
-                "latitude": "31.579673"
-            }, {
-                "longitude": "120.468829",
-                "latitude": "31.579618"
-            }, {
-                "longitude": "120.468645",
-                "latitude": "31.579563"
-            }, {
-                "longitude": "120.46849",
-                "latitude": "31.579545"
-            }, {
-                "longitude": "120.468313",
-                "latitude": "31.579563"
-            }, {
-                "longitude": "120.468211",
-                "latitude": "31.5796"
-            }, {
-                "longitude": "120.468152",
-                "latitude": "31.579829"
-            }, {
-                "longitude": "120.468184",
-                "latitude": "31.580526"
-            }]
+    "longitude": "120.468194",
+    "latitude": "31.580517"
+}, {
+    "longitude": "120.468287",
+    "latitude": "31.580629"
+}, {
+    "longitude": "120.468387",
+    "latitude": "31.58065"
+}, {
+    "longitude": "120.468703",
+    "latitude": "31.580654"
+}, {
+    "longitude": "120.46887",
+    "latitude": "31.580656"
+}, {
+    "longitude": "120.468973",
+    "latitude": "31.580478"
+}, {
+    "longitude": "120.468967",
+    "latitude": "31.580153"
+}, {
+    "longitude": "120.468967",
+    "latitude": "31.579732"
+}, {
+    "longitude": "120.468951",
+    "latitude": "31.579673"
+}, {
+    "longitude": "120.468829",
+    "latitude": "31.579618"
+}, {
+    "longitude": "120.468645",
+    "latitude": "31.579563"
+}, {
+    "longitude": "120.46849",
+    "latitude": "31.579545"
+}, {
+    "longitude": "120.468313",
+    "latitude": "31.579563"
+}, {
+    "longitude": "120.468211",
+    "latitude": "31.5796"
+}, {
+    "longitude": "120.468152",
+    "latitude": "31.579829"
+}, {
+    "longitude": "120.468184",
+    "latitude": "31.580526"
+}]
 polist_1 = [{
-                "longitude": "120.468194",
-                "latitude": "31.580517"
-            }, {
-                "longitude": "120.468287",
-                "latitude": "31.580629"
-            }, {
-                "longitude": "120.468387",
-                "latitude": "31.58065"
-            }, {
-                "longitude": "120.468703",
-                "latitude": "31.580654"
-            }, {
-                "longitude": "120.46887",
-                "latitude": "31.580656"
-            }, {
-                "longitude": "120.468973",
-                "latitude": "31.580478"
-            }, {
-                "longitude": "120.468967",
-                "latitude": "31.580153"
-            }, {
-                "longitude": "120.468967",
-                "latitude": "31.579732"
-            }, {
-                "longitude": "120.468951",
-                "latitude": "31.579673"
-            }, {
-                "longitude": "120.468829",
-                "latitude": "31.579618"
-            }, {
-                "longitude": "120.468645",
-                "latitude": "31.579563"
-            }, {
-                "longitude": "120.46849",
-                "latitude": "31.579545"
-            }, {
-                "longitude": "120.468313",
-                "latitude": "31.579563"
-            }, {
-                "longitude": "120.468211",
-                "latitude": "31.5796"
-            }, {
-                "longitude": "120.468152",
-                "latitude": "31.579829"
-            }, {
-                "longitude": "120.468184",
-                "latitude": "31.580526"
-            }]
+    "longitude": "120.468194",
+    "latitude": "31.580517"
+}, {
+    "longitude": "120.468287",
+    "latitude": "31.580629"
+}, {
+    "longitude": "120.468387",
+    "latitude": "31.58065"
+}, {
+    "longitude": "120.468703",
+    "latitude": "31.580654"
+}, {
+    "longitude": "120.46887",
+    "latitude": "31.580656"
+}, {
+    "longitude": "120.468973",
+    "latitude": "31.580478"
+}, {
+    "longitude": "120.468967",
+    "latitude": "31.580153"
+}, {
+    "longitude": "120.468967",
+    "latitude": "31.579732"
+}, {
+    "longitude": "120.468951",
+    "latitude": "31.579673"
+}, {
+    "longitude": "120.468829",
+    "latitude": "31.579618"
+}, {
+    "longitude": "120.468645",
+    "latitude": "31.579563"
+}, {
+    "longitude": "120.46849",
+    "latitude": "31.579545"
+}, {
+    "longitude": "120.468313",
+    "latitude": "31.579563"
+}, {
+    "longitude": "120.468211",
+    "latitude": "31.5796"
+}, {
+    "longitude": "120.468152",
+    "latitude": "31.579829"
+}, {
+    "longitude": "120.468184",
+    "latitude": "31.580526"
+}]
 token_list = []
 
 
-def geticket():
+def get_access_token(session):
+    """
+    获取微信公众号的access_token
+    :return: access_token
+    """
+    url = 'https://api.weixin.qq.com/cgi-bin/token'
+    params = {
+        'grant_type': 'client_credential',
+        'appid': 'wx20976a32c7a2fd75',
+        'secret': '1f93042373d4622442e884bbc5dec74e'
+    }
+    res = session.get(url=url, params=params).json()
+    return res['access_token']
+
+
+def get_ticket(session):
+    """
+    获取微信ticket，用于生成二维码
+    :return: ticket
+    """
     while True:
         with open('accesstoken.txt', 'r') as f:
-            getaccesstoken = f.read()
+            access_token = f.read()
         url = 'https://api.weixin.qq.com/cgi-bin/ticket/getticket'
         params = {
-            'access_token': getaccesstoken,
+            'access_token': access_token,
             'type': 2
         }
-        res = requests.get(url=url, params=params).json()
+        res = session.get(url=url, params=params).json()
         errcode = res['errcode']
-        if errcode != 0:
-            url = 'https://api.weixin.qq.com/cgi-bin/token'
-            params = {
-                'grant_type': 'client_credential',
-                'appid': 'wx20976a32c7a2fd75',
-                'secret': '1f93042373d4622442e884bbc5dec74e'
-            }
-            accesstoken = requests.get(url=url, params=params).json()
-            accesstoken = accesstoken['access_token']
-
+        if errcode == 0:
+            ticket = res['ticket']
+            return ticket
+        elif errcode == 40001 or errcode == 42001:
+            access_token = get_access_token(session)
             with open('accesstoken.txt', 'w') as f:
-                f.write(accesstoken)
-        else:
-            geticket = res['ticket']
-            break
-    return geticket
+                f.write(access_token)
 
-def getqrcode(geticket):
-    import uuid
-    import time
-    import hashlib
+
+def getqrcode(geticket, session):
+    """
+    获取登录二维码
+    :param geticket: geticket()函数返回的ticket
+    :return: 包含二维码base64编码和uuid的列表
+    """
     appid = 'wx20976a32c7a2fd75'
-    noncestr = uuid.uuid4()
+    noncestr = str(uuid.uuid4())
     timestamp = int(time.time())
     sdk_ticket = geticket
-    pre_signature = 'appid={}&noncestr={}&sdk_ticket={}&timestamp={}'.format(appid, noncestr, sdk_ticket, timestamp)
-    pre_signature_2 = hashlib.sha1(pre_signature.encode('utf-8'))
-    signature = pre_signature_2.hexdigest()
-    url = 'https://open.weixin.qq.com/connect/sdk/qrconnect'#https://open.weixin.qq.com/connect/sdk/qrconnect&appid=wx20976a32c7a2fd75&noncestr=79dd4a3e-cb9b-43ea-b1ec-800d6450dd8f&timestamp=1667124209&scope=snsapi_userinfo&signature=841576b1e6fe8c5dd446b20e53da46de7c3b54a4
+
+    # 计算签名
+    pre_signature = "appid={}&noncestr={}&sdk_ticket={}&timestamp={}".format(
+        appid, noncestr, sdk_ticket, timestamp
+    )
+    signature = hashlib.sha1(pre_signature.encode('utf-8')).hexdigest()
+
+    # 构造URL和参数
+    url = "https://open.weixin.qq.com/connect/sdk/qrconnect"
     params = {
-        'appid': appid,
-        'noncestr': noncestr,
-        'timestamp': timestamp,
-        'scope': 'snsapi_userinfo',
-        'signature': signature
+        "appid": appid,
+        "noncestr": noncestr,
+        "timestamp": timestamp,
+        "scope": "snsapi_userinfo",
+        "signature": signature,
     }
-    qrcode = requests.get(url=url, params=params)
-    tmp_qrcode = json.loads(qrcode.text)
-    qrcode_base64 = tmp_qrcode['qrcode']['qrcodebase64']
-    uid = tmp_qrcode['uuid']
+
+    # 发送请求，获取二维码
+    response = session.get(url=url, params=params)
+    t9 = time.time()
+
+    # 解析响应，获取二维码的base64编码和uuid
+    data = response.json()
+    qrcode_base64 = data["qrcode"]["qrcodebase64"]
+    uid = data["uuid"]
+
     return [qrcode_base64, uid]
 
-def kepp_qrimg(str,uid):
+
+def kepp_qrimg(str, uid):
+    """
+    将二维码和uuid封装到HTML模板中，并返回HTML页面的功能
+    :param str: getqrcode()函数返回的二维码base64编码
+    :param uid: getqrcode()函数返回的uuid
+    :return: 将二维码和uuid封装到HTML模板中，并返回HTML页面的功能
+    """
     from flask import render_template
     img_stream = str
     uuid = uid
-    return render_template('index.html',img_stream=img_stream,uuid=uuid)
+    return render_template('index.html', img_stream=img_stream, uuid=uuid)
 
 
 def _rsa_encrypt(pub_key_str, msg):
@@ -186,9 +226,7 @@ def _rsa_encrypt(pub_key_str, msg):
     :param msg: 待加密json文本
     :return:
     """
-    import base64
-    from Crypto.Cipher import PKCS1_v1_5 as Cipher_pkcs1_v1_5
-    from Crypto.PublicKey import RSA
+
     msg = msg.encode('utf-8')
     length = len(msg)
     default_length = 117
@@ -210,32 +248,39 @@ def _rsa_encrypt(pub_key_str, msg):
 
     return base64.b64encode(byte_data)
 
-def get_user_info_data(code,token):
-    import re
+
+def get_user_info_data(session, code, token):
+    """
+    获取用户信息
+    :param code: getinfo()函数返回的code
+    :param token: 从getinfo()函数返回的token
+    :return: 用户信息(学号、姓名、手机号）
+    """
     url = "https://app.xtotoro.com/app/platform/login/login"
     data_getinfo_row = {
-                        "code": code,
-                        "latitude": "39.91639769716885",
-                        "loginWay": "2",
-                        "longitude": "116.4102511891155",
-                        "password": "",
-                        "phoneNumber": "",
-                        "token": token
-                        }
+        "code": code,
+        "latitude": "39.91639769716885",
+        "loginWay": "2",
+        "longitude": "116.4102511891155",
+        "password": "",
+        "phoneNumber": "",
+        "token": token
+    }
     data_getinfo_row = str(data_getinfo_row)
-    data_getinfo_row = data_getinfo_row.replace("'",'"')
-    data_getinfo = _rsa_encrypt(pub_key_str,data_getinfo_row)
+    data_getinfo_row = data_getinfo_row.replace("'", '"')
+    data_getinfo = _rsa_encrypt(pub_key_str, data_getinfo_row)
     data_getinfo = str(data_getinfo)
     reg = re.compile(r"'(.*?)'")
-    data_getinfo = re.findall(reg,data_getinfo)
+    data_getinfo = re.findall(reg, data_getinfo)
     data_getinfo = data_getinfo[0]
     data_getinfo = str(data_getinfo)
-    stunum = requests.post(url=url,headers=header,data=data_getinfo).text
+    stunum = session.post(url=url, headers=header, data=data_getinfo).text
     stunum = json.loads(stunum)
     stuNum = stunum['stuNumber']
     stuName = stunum['stuName']
     phoneNumber = stunum['phoneNumber']
-    return stuNum,stuName,phoneNumber
+    return stuNum, stuName, phoneNumber
+
 
 class Location:
     def __init__(self, locationArray):
@@ -322,7 +367,7 @@ class Location:
             self.locationArray.insert(2 * i + 1, newnode)
 
     def checkRandomStrength(self):
-        if CONSTANT.RANDOMLOCATION_STRENGETH == False:
+        if not CONSTANT.RANDOMLOCATION_STRENGETH:
             origin_len = len(self.locationArray)
             if origin_len <= 7:
                 return 2
@@ -375,10 +420,8 @@ class Location:
         # print(newLocationArray)
         return newLocationArray
 
-def get_run_post_data(stuNum, token):
-    import datetime
-    import random
-    import re
+
+def get_run_post_data(session, stuNum, token):
     global polist
     global polist_1
     polist = Location.getRandomLocation(Location(polist))
@@ -400,7 +443,8 @@ def get_run_post_data(stuNum, token):
 
     """
     time_now = datetime.datetime.now()
-    start_time = (datetime.datetime.now() + datetime.timedelta(minutes=-random.uniform(18, 22),seconds=-random.uniform(30, 60)))
+    start_time = (datetime.datetime.now() + datetime.timedelta(minutes=-random.uniform(18, 22),
+                                                               seconds=-random.uniform(30, 60)))
     usr_time = (time_now - start_time)
     usr_time = str(usr_time)
     usetime = usr_time[0:-7]
@@ -415,7 +459,7 @@ def get_run_post_data(stuNum, token):
     """
     data_raw = {
         "LocalSubmitReason": "",
-        "avgSpeed": speed,  #################################################################
+        "avgSpeed": speed,
         "baseStation": "mcc:460 mnc:0 lac:20706 ci:24832 strength:0",
         "consume": "0",
         "endTime": end_time,
@@ -451,44 +495,47 @@ def get_run_post_data(stuNum, token):
     data = re.findall(reg, data)
     data = str(data)
     url = "https://app.xtotoro.com/app/platform/recrecord/sunRunExercises"
-    res = requests.post(url=url, headers=header, data=data).text
+    res = session.post(url=url, headers=header, data=data).text  #
     polist = polist_1
     return res
 
-def morning_data(stunum,token):
+
+def morning_data(stunum, token):
     global pub_key_str
     import re
     import random
-    lougitude = random.uniform(120.474700,120.474800)
+    lougitude = random.uniform(120.474700, 120.474800)
     lougitude = str(lougitude)
-    latitude = random.uniform(31.583100,31.583300)
+    latitude = random.uniform(31.583100, 31.583300)
     latitude = str(latitude)
     data = {
-            "mac":"",
-            "pointId":"09",
-            "qrCode":"mornsignPlace-2022101800000109",
-            "longitude":lougitude,#标准点经度点：120.47472216814754
-            "latitude":latitude,#标准纬度点：31.58319574260332
-            "baseStation":"",
-            "token":token,
-            "taskId":"mornsignTaskPaper-20211107000001",
-            "faceData":"",
-            "stuNumber":stunum,
-            "appVersion":"",
-            "phoneInfo":"",
-            "phoneNumber":""
-             }
+        "mac": "",
+        "pointId": "09",
+        "qrCode": "mornsignPlace-2022101800000109",
+        "longitude": lougitude,  # 标准点经度点：120.47472216814754
+        "latitude": latitude,  # 标准纬度点：31.58319574260332
+        "baseStation": "",
+        "token": token,
+        "taskId": "mornsignTaskPaper-20211107000001",
+        "faceData": "",
+        "stuNumber": stunum,
+        "appVersion": "",
+        "phoneInfo": "",
+        "phoneNumber": ""
+    }
     data = str(data)
-    data = _rsa_encrypt(pub_key_str,data)
+    data = _rsa_encrypt(pub_key_str, data)
     data = str(data)
     reg = re.compile(r"'(.*?)'")
     data = re.findall(reg, data)
     return data
 
-@app.route('/fuck_morning')
-def fuck_morning():
-    import re
-    url_morning = "https://app.xtotoro.com/app/platform/recrecord/morningExercises"
+
+def get_code(session):
+    """
+    用户扫码登录后，获取用户登录信息
+    :return:
+    """
     global uid_gobal
     uid = uid_gobal
     url = 'https://long.open.weixin.qq.com/connect/l/qrconnect'
@@ -496,123 +543,119 @@ def fuck_morning():
         'f': 'json',
         'uuid': uid
     }
-    callback = requests.get(url=url, params=params)
+    try:
+        callback = session.get(url=url, params=params, timeout=3)
+        print(callback.text)
+    except requests.exceptions.Timeout:
+
+        print('获取用户登录信息失败')
+        return None
     tmp_callback = json.loads(callback.text)
     code_ = tmp_callback['wx_code']
-    code_ = str(code_)
-    code = {"code": code_}
-    code = f'"code":"{code.get("code")}"'
-    code_data = "{" + code + "}"
-    """
-    以上构造code的数据包
-    """
-    data = _rsa_encrypt(pub_key_str, code_data)
-    data = str(data)
+    code_data = {
+        "code": code_
+    }
+    code_data_str = json.dumps(code_data)
+    encrypted_data = _rsa_encrypt(pub_key_str, code_data_str)
     reg = re.compile(r"'(.*?)'")
-    code_data = re.findall(reg, data)
-    code_data = str(code_data)
-    url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
-    token = requests.post(url=url_getoken, headers=header, data=code_data).text
-    token = json.loads(token)
-    token = token['token']
-    token = str(token)
-    """
-    以上获取token
-    """
-    stu_info_list = get_user_info_data(code_, token)
-    stuNum = str(stu_info_list[0])
-    data = str(morning_data(stuNum,token))
-    res_morning = requests.post(url=url_morning,headers=header,data=data)
-    return jsonify(res_morning)
+    encrypted_data_str = re.findall(reg, str(encrypted_data))[0]
+    return encrypted_data_str, code_
 
 
-ip_counts = {}
-@app.route('/', methods=['GET', 'POST'])
-def action():
-    import datetime
-    import os
-    global uid_gobal
-    ip_address = request.remote_addr  # 获取访问者的 IP 地址
-    today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
-
-    if ip_address in ip_counts:
-        if today_str in ip_counts[ip_address]:
-            # 如果该 IP 地址今天已经访问了 6 次，则将 IP 地址记录到日志中并拒绝访问
-            if ip_counts[ip_address][today_str] >= 6:
-                with open(os.path.join(os.getcwd(), 'access.log'), 'a') as f:
-                    f.write(f'{ip_address} has reached the limit of 6 accesses today.\n')
-                return 'Access denied.'
-            # 否则，访问次数加 1
-            else:
-                ip_counts[ip_address][today_str] += 1
-        else:
-            # 如果该 IP 地址今天还没有访问过，则新建一个记录
-            ip_counts[ip_address][today_str] = 1
-    else:
-        # 如果该 IP 地址还没有访问过，则新建一个记录
-        ip_counts[ip_address] = {today_str: 1}
-
-    b = geticket()
-    c = getqrcode(b)
-    uid_gobal = c[1]
-
-    return kepp_qrimg(c[0], c[1])
-@app.route('/fuck',methods = ['GET'])
-def action_getcode():
-    from flask import request
-    import re
-    import os
-    import datetime
-
-    if request.method == 'GET':
-        global uid_gobal
-        uid = uid_gobal
-        url = 'https://long.open.weixin.qq.com/connect/l/qrconnect'
-        params = {
-            'f': 'json',
-            'uuid': uid
-        }
-        callback = requests.get(url=url, params=params)
-        tmp_callback = json.loads(callback.text)
-        code_ = tmp_callback['wx_code']
-        code_ = str(code_)
-        code = {"code": code_}
-        code = f'"code":"{code.get("code")}"'
-        code_data = "{" + code + "}"
-        """
-        以上构造code的数据包
-        """
-        data = _rsa_encrypt(pub_key_str,code_data)
-        data = str(data)
-        reg = re.compile(r"'(.*?)'")
-        code_data = re.findall(reg,data)
-        code_data = str(code_data)
+@app.route('/fuck_morning')
+def fuck_morning():
+    with requests.session() as session:
+        url_morning = "https://app.xtotoro.com/app/platform/recrecord/morningExercises"
+        list1 = get_code(session)
+        code_data = list1[0]
+        code_ = list1[1]
         url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
-        token = requests.post(url=url_getoken,headers=header,data=code_data).text
+        token = session.post(url=url_getoken, headers=header, data=code_data).text
         token = json.loads(token)
         token = token['token']
         token = str(token)
         """
         以上获取token
         """
-        stu_info_list = get_user_info_data(code_,token)
+        stu_info_list = get_user_info_data(session, code_, token)
         stuNum = str(stu_info_list[0])
-        stuName = str(stu_info_list[1])#用于记录用过这个项目跑步人员名字，需要使用的时候再修改
-        phoneNumber = str(stu_info_list[2])
-        ip_address = request.remote_addr  # 获取访问者的 IP 地址
-        today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
-        with open(os.path.join(os.getcwd(), 'access.log'), 'a') as f:
-            f.write(f'{ip_address} has reached the limit of 6 accesses today.\n')
+        data = str(morning_data(stuNum, token))
+        res_morning = session.post(url=url_morning, headers=header, data=data)
+    session.close()
+    return jsonify(res_morning)
 
-        res = get_run_post_data(stuNum, token)
-        res_json = json.loads(res)
-        #加一个if判断
-        if res_json['status'] == "00":
-            ip_address = request.remote_addr  # 获取访问者的 IP 地址
-            today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
-            with open(os.path.join(os.getcwd(), 'stu.log'), 'a') as f:
-                f.write(f'{ip_address} {stuName} {stuNum} {phoneNumber}\n')
+
+@app.route('/', methods=['GET', 'POST'])
+def action():
+    """
+    获取二维码的控制函数
+    :return:
+    """
+    t1 = time.time()
+    global uid_gobal
+    with requests.Session() as session:
+        b = get_ticket(session)
+        c = getqrcode(b, session)
+        uid_gobal = c[1]
+    t2 = time.time()
+    return kepp_qrimg(c[0], c[1])
+
+
+@app.route('/fuck', methods=['GET'])
+def run_main():
+    from flask import request
+    if request.method == 'GET':
+        with requests.Session() as session:
+            t1 = time.time()
+            list1 = get_code(session)
+            t2 = time.time()
+            code_data = list1[0]
+            code_ = list1[1]
+            session.headers.update(header)
+            t3 = time.time()
+            token = get_token(session, code_data)
+            t4 = time.time()
+            t5 = time.time()
+            stu_info_list = get_user_info_data(session, code_, token)
+            t6 = time.time()
+            """
+            以上获取token
+        
+            """
+            stuNum = str(stu_info_list[0])
+            stuName = str(stu_info_list[1])  # 用于记录用过这个项目跑步人员名字，需要使用的时候再修改
+            phoneNumber = str(stu_info_list[2])
+            t7 = time.time()
+            res = get_run_post_data(session, stuNum, token)  # 传入学号和龙猫token，发送跑步请求包
+            t8 = time.time()
+            res_json = json.loads(res)  # 解析跑步请求的结果
+
+            # 写入跑步日志
+            if res_json['status'] == "00":
+                today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
+                with open(os.path.join(os.getcwd(), 'stu.log'), 'a', encoding='utf-8') as f:
+                    f.write(f' {stuName} {stuNum} {phoneNumber}\n')
+        session.close()
         return jsonify(res)
 
+
+def get_token(session, code_data):
+    url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
+    token = session.post(url=url_getoken, headers=header, data=code_data).text
+    token = json.loads(token)
+    return str(token['token'])
+
+
+@app.route('/refresh_qrcode')
+def refresh_qrcode():
+    # 重新获取二维码
+    global uid_gobal
+    with requests.session() as session:
+        b = get_ticket(session)
+        c = getqrcode(b, session)
+        uid_gobal = c[1]
+    return c[0]
+
+
 if __name__ == '__main__':
-    app.run()
+    app.run(threaded=10, processes=2)
