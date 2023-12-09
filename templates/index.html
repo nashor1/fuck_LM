@@ -14,134 +14,67 @@
     </script>
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta charset="UTF-8">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/primer-c581c4e461bb.css">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/global-0e278d45156f.css">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/github-dcaf0f44dbb1.css">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/dashboard-74d536a2af1a.css">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/site-2f61d41ff9ad.css">
-    <link crossorigin="anonymous" media="all" rel="stylesheet"
-          href="https://github.githubassets.com/assets/home-3bba68f788b5.css">
     <title>fuck_longmao</title>
-    <style>
-        body {
-  background-color: black;
-}
-        .base {
-            height: 902px;
-            width: 100%;
-            background-size: cover;
-            background-repeat: no-repeat;
-            color: white;
-        }
-
-        .base2 {
-            position: fixed;
-            top: 20%;
-            left: 70%;
-        }
-    </style>
 </head>
 <body>
 <script>alert("声明：本项目仅以学习逆向为目的，如将本项目用于其他途径造成后果，本人概不负责")</script>
-<div class="overflow-hidden" data-color-mode="dark" data-light-theme="light" data-dark-theme="dark"
-     style="background-image: url('static/git_background.webp')">
-
+<div>
     <div class="base">
         <center>
             <br><br><br><br>
             <h1 class="h0-mktg mt-sm-6 mt-md-11 mt-lg-9 mb-2 mb-sm-4 position-relative z-2"
-                style="font-weight: 600 !important; -0.03:m !important; color: #f3f0f0">
-                Welcome Fuck_LM
+                style="font-weight: 600 !important; -0.03:m !important; color: #1f2020">
+                Welcome to Fuck_LM
             </h1>
-            <p class="d-block color-fg-subtle f4-mktg">
-                如使用本项目，默认您同意承担由该行为带来的一切后果，与开发者无关。</p>
-
+            <p class="d-block">如使用本项目，默认您同意承担由该行为带来的一切后果，与开发者无关。</p>
             <img style="width:180px" id="qr-code" src="data:;base64,{{ img_stream }}" alt="QR Code">
             <br>
             <button id="refresh-btn" type="button" onclick="refreshQRCode()">刷新二维码</button>
-
-
-            <a class="btn-mktg home-campaign-enterprise btn-muted-mktg"
-               data-analytics-event="{&quot;category&quot;:&quot;Start a free enterprise trial&quot;,&quot;action&quot;:&quot;click to Start a free enterprise trial&quot;,&quot;label&quot;:&quot;ref_cta:Start a free enterprise trial;&quot;}"
-               href="#" data-test-selector="start-trial-button" onclick="myFunction()">
-                start run!
-
-                <svg xmlns="http://www.w3.org/2000/svg" class="octicon arrow-symbol-mktg" width="16" height="16"
-                     viewBox="0 0 16 16" fill="none">
-                    <path fill="currentColor"
-                      d="M7.28033 3.21967C6.98744 2.92678 6.51256 2.92678 6.21967 3.21967C5.92678 3.51256 5.92678 3.98744 6.21967 4.28033L7.28033 3.21967ZM11 8L11.5303 8.53033C11.8232 8.23744 11.8232 7.76256 11.5303 7.46967L11 8ZM6.21967 11.7197C5.92678 12.0126 5.92678 12.4874 6.21967 12.7803C6.51256 13.0732 6.98744 13.0732 7.28033 12.7803L6.21967 11.7197ZM6.21967 4.28033L10.4697 8.53033L11.5303 7.46967L7.28033 3.21967L6.21967 4.28033ZM10.4697 7.46967L6.21967 11.7197L7.28033 12.7803L11.5303 8.53033L10.4697 7.46967Z"></path>
-                <path class="octicon-chevrow-stem" stroke="currentColor" d="M1.75 8H11" stroke-width="1.5"
-                      stroke-linecap="round"></path>
-            </svg>
-
-        </a>
-        <a class="btn-mktg home-campaign-enterprise btn-muted-mktg"
-           data-analytics-event="{&quot;category&quot;:&quot;Start a free enterprise trial&quot;,&quot;action&quot;:&quot;click to Start a free enterprise trial&quot;,&quot;label&quot;:&quot;ref_cta:Start a free enterprise trial;&quot;}"
-           href="/#" data-test-selector="start-trial-button" onclick="myFunction_morning()">
-            fuck morning!
-
-            <svg xmlns="http://www.w3.org/2000/svg" class="octicon arrow-symbol-mktg" width="16" height="16"
-                 viewBox="0 0 16 16" fill="none">
-                <path fill="currentColor"
-                      d="M7.28033 3.21967C6.98744 2.92678 6.51256 2.92678 6.21967 3.21967C5.92678 3.51256 5.92678 3.98744 6.21967 4.28033L7.28033 3.21967ZM11 8L11.5303 8.53033C11.8232 8.23744 11.8232 7.76256 11.5303 7.46967L11 8ZM6.21967 11.7197C5.92678 12.0126 5.92678 12.4874 6.21967 12.7803C6.51256 13.0732 6.98744 13.0732 7.28033 12.7803L6.21967 11.7197ZM6.21967 4.28033L10.4697 8.53033L11.5303 7.46967L7.28033 3.21967L6.21967 4.28033ZM10.4697 7.46967L6.21967 11.7197L7.28033 12.7803L11.5303 8.53033L10.4697 7.46967Z"></path>
-                <path class="octicon-chevrow-stem" stroke="currentColor" d="M1.75 8H11" stroke-width="1.5"
-                      stroke-linecap="round"></path>
-            </svg>
-
-        </a>
-        <script>
-            function myFunction() {
-                fetch('/fuck', {
-                    method: 'GET'
-                })
-                    .then(response => response.json()) // 将响应转换为 JSON 格式
-                    .then(data => {
-                        // 弹出一个提示框，展示响应内容
-                        alert("阳光跑已提交，自行检查是否有记录，不要重复提交！");
-                    })
-                    .catch(error => {
-                        // 发生错误时显示错误信息
-                        console.error('Error:', error);
-                    });
-            }
-        </script>
-        <script>
-            function myFunction_morning() {
-                fetch('/fuck_morning', {
-                    method: 'GET'
-                })
-                    .then(response => response.json()) // 将响应转换为 JSON 格式
-                    .then(data => {
-                        // 弹出一个提示框，展示响应内容
-                        alert("早操签到已提交，自行检查龙猫校园是否有记录，不要重复提交！");
-                    })
-                    .catch(error => {
-                        // 发生错误时显示错误信息
-                        console.error('Error:', error);
-                        alert(error);
-                    });
-            }
-        </script>
-
-            <p class="d-block color-fg-subtle f4-mktg">
-                注意：获取的二维码只能用另一个设备打开才能扫码，不能保存二维码用微信识别，否则会失败</p>
-            <p class="d-block color-fg-subtle f4-mktg">技术交流群：603014308</p>
-
-
-            <p class="d-block color-fg-subtle f4-mktg">提交失败请刷新页面重试，出现bug请加群联系群主</p>
-
+            <br><br>
+            <button onclick="myFunction()">start run!</button>
+            <br><br>
+            <button onclick="myFunction_morning()">fuck morning!</button>
+            <br><br>
+            <script>
+                function myFunction() {
+        fetch('/fuck', {
+            method: 'GET'
+        })
+            .then(response => response.json())  // 将响应转换为 JSON 格式
+            .then(data => {
+                // 弹出一个提示框，展示响应内容和请求结果
+                alert("阳光跑已提交，自行检查是否有记录，不要重复提交！\n请求结果： " + data.result);
+            })
+            .catch(error => {
+                // 发生错误时显示错误信息
+                console.error('Error:', error);
+            });
+    }
+            </script>
+            <script>
+                function myFunction_morning() {
+        fetch('/fuck_morning', {
+            method: 'GET'
+        })
+            .then(response => response.json())  // 将响应转换为 JSON 格式
+            .then(data => {
+                // 弹出一个提示框，展示响应内容和请求结果
+                alert("早操签到已提交，自行检查龙猫校园是否有记录，不要重复提交！\n请求结果： " + data.result);
+            })
+            .catch(error => {
+                // 发生错误时显示错误信息
+                console.error('Error:', error);
+                alert(error);
+            });
+    }
+            </script>
+            <p class="d-block">注意：获取的二维码只能用另一个设备打开才能扫码，不能保存二维码用微信识别，否则会失败</p>
+            <p class="d-block">技术交流群：603014308</p>
+            <p class="d-block">提交失败请刷新页面重试，出现bug请加群联系群主</p>
         </center>
     </div>
     <div class="base2">
-
-        <img src="{{ url_for('static', filename='git2_background.webp', _external=True) }}" alt="example">
-
-</div>
+    </div>
 </div>
 </body>
-</html>                                                                                                                      s
+</html>
