@@ -136,8 +136,8 @@ def get_access_token(session):
     url = 'https://api.weixin.qq.com/cgi-bin/token'
     params = {
         'grant_type': 'client_credential',
-        'appid': '',
-        'secret': ''
+        'appid': 'wx20976a32c7a2fd75',
+        'secret': '1f93042373d4622442e884bbc5dec74e'
     }
     res = session.get(url=url, params=params).json()
     return res['access_token']
@@ -161,11 +161,10 @@ def get_ticket(session):
         if errcode == 0:
             ticket = res['ticket']
             return ticket
-        elif errcode == 40001 or errcode == 42001:
+        else:
             access_token = get_access_token(session)
             with open('accesstoken.txt', 'w') as f:
                 f.write(access_token)
-
 
 def getqrcode(geticket, session):
     """
@@ -490,6 +489,7 @@ def get_run_post_data(session, stuNum, token):
     }
     data_raw = str(data_raw)
     data = _rsa_encrypt(pub_key_str, data_raw)
+    # print(data)
     data = str(data)
     reg = re.compile(r"'(.*?)'")
     data = re.findall(reg, data)
@@ -545,12 +545,27 @@ def get_code(session):
     }
     try:
         callback = session.get(url=url, params=params, timeout=3)
-        print(callback.text)
     except requests.exceptions.Timeout:
 
         print('获取用户登录信息失败')
         return None
-    tmp_callback = json.loads(callback.text)
+    if callback.text:
+        try:
+            tmp_callback = json.loads(callback.text)  # 尝试解析 JSON
+        except json.JSONDecodeError:
+            # 如果解析失败，处理错误（例如，打印错误信息或返回特定的错误响应）
+            code_ = None
+            encrypted_data_str = None
+            return encrypted_data_str, code_
+
+    else:
+        # res 为空时的处理（例如，打印错误信息或返回特定的错误响应）
+        code_ = None
+        encrypted_data_str = None
+        return encrypted_data_str, code_
+    # tmp_callback = json.loads(callback.text)
+
+
     code_ = tmp_callback['wx_code']
     code_data = {
         "code": code_
@@ -567,13 +582,22 @@ def fuck_morning():
     with requests.session() as session:
         url_morning = "https://app.xtotoro.com/app/platform/recrecord/morningExercises"
         list1 = get_code(session)
+        if list1 is None:
+            session.close()
+            return jsonify({'result': "登录失败，请重新扫码"})
         code_data = list1[0]
         code_ = list1[1]
-        url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
-        token = session.post(url=url_getoken, headers=header, data=code_data).text
-        token = json.loads(token)
-        token = token['token']
-        token = str(token)
+
+        # url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
+        # token = session.post(url=url_getoken, headers=header, data=code_data).text
+        # token = json.loads(token)
+        # token = token['token']
+        # token = str(token)
+        
+        token = get_token(session, code_data)
+        if token is None:
+            session.close()
+            return jsonify({'result': "获取token失败，重新扫码登录"})
         """
         以上获取token
         """
@@ -581,8 +605,9 @@ def fuck_morning():
         stuNum = str(stu_info_list[0])
         data = str(morning_data(stuNum, token))
         res_morning = session.post(url=url_morning, headers=header, data=data)
+        session.close()
     session.close()
-    return jsonify(res_morning)
+    return jsonify({'result': res_morning.text})
 
 
 @app.route('/', methods=['GET', 'POST'])
@@ -597,8 +622,12 @@ def action():
         b = get_ticket(session)
         c = getqrcode(b, session)
         uid_gobal = c[1]
+        session.close()
     t2 = time.time()
+    session.close()
     return kepp_qrimg(c[0], c[1])
+
+
 
 
 @app.route('/fuck', methods=['GET'])
@@ -608,16 +637,27 @@ def run_main():
         with requests.Session() as session:
             t1 = time.time()
             list1 = get_code(session)
-            t2 = time.time()
+            if list1 is None:
+                session.close()
+                return jsonify({'result': "登录失败，请重新扫码"})
+            # t2 = time.time()
             code_data = list1[0]
             code_ = list1[1]
             session.headers.update(header)
-            t3 = time.time()
+            # t3 = time.time()
+            # token = get_token(session, code_data)
             token = get_token(session, code_data)
-            t4 = time.time()
-            t5 = time.time()
+            if token is None:
+                session.close()
+                return jsonify({'result': "获取token失败，重新扫码登录"})
+
+            # t4 = time.time()
+            # t5 = time.time()
             stu_info_list = get_user_info_data(session, code_, token)
-            t6 = time.time()
+            if stu_info_list is None:
+                session.close()
+                return jsonify({'result': "获取用户信息失败，重新扫码登录"})
+            # t6 = time.time()
             """
             以上获取token
         
@@ -625,25 +665,48 @@ def run_main():
             stuNum = str(stu_info_list[0])
             stuName = str(stu_info_list[1])  # 用于记录用过这个项目跑步人员名字，需要使用的时候再修改
             phoneNumber = str(stu_info_list[2])
-            t7 = time.time()
-            res = get_run_post_data(session, stuNum, token)  # 传入学号和龙猫token，发送跑步请求包
-            t8 = time.time()
-            res_json = json.loads(res)  # 解析跑步请求的结果
 
+            res = get_run_post_data(session, stuNum, token)  # 传入学号和龙猫token，发送跑步请求包
+            if res:
+                try:
+                    res_json = json.loads(res)  # 尝试解析 JSON
+                except json.JSONDecodeError:
+                    # 如果解析失败，处理错误（例如，打印错误信息或返回特定的错误响应）
+                    session.close()
+                    return jsonify({'result': "个人信息解析失败，重新扫码登录"})
+
+            else:
+                # res 为空时的处理（例如，打印错误信息或返回特定的错误响应）
+                session.close()
+                return jsonify({'result': "个人信息获取为空，重新扫码登录"})
+
+            # print(res_json)
             # 写入跑步日志
             if res_json['status'] == "00":
                 today_str = datetime.date.today().isoformat()  # 获取今天的日期字符串
                 with open(os.path.join(os.getcwd(), 'stu.log'), 'a', encoding='utf-8') as f:
                     f.write(f' {stuName} {stuNum} {phoneNumber}\n')
+            else:
+                return jsonify({'result': "个人信息解析出错，重新扫码登录"})
+            session.close()
         session.close()
-        return jsonify(res)
+        return jsonify({'result': res})
 
 
 def get_token(session, code_data):
     url_getoken = "https://app.xtotoro.com/app/platform/serverlist/getLesseeServer"
-    token = session.post(url=url_getoken, headers=header, data=code_data).text
-    token = json.loads(token)
-    return str(token['token'])
+    try:
+        response = session.post(url=url_getoken, headers=header, data=code_data).text
+        token = json.loads(response)
+        if 'token' in token:
+            return str(token['token'])
+        else:
+            return None
+    except json.JSONDecodeError:
+        return None
+    except Exception as e:
+        return None
+
 
 
 @app.route('/refresh_qrcode')
@@ -657,5 +720,5 @@ def refresh_qrcode():
     return c[0]
 
 
-if __name__ == '__main__':
-    app.run(threaded=10, processes=2)
+if __name__ == "__main__":
+    app.run()
