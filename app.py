@@ -136,8 +136,8 @@ def get_access_token(session):
     url = 'https://api.weixin.qq.com/cgi-bin/token'
     params = {
         'grant_type': 'client_credential',
-        'appid': 'wx20976a32c7a2fd75',
-        'secret': '1f93042373d4622442e884bbc5dec74e'
+        'appid': '',
+        'secret': ''
     }
     res = session.get(url=url, params=params).json()
     return res['access_token']
