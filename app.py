@@ -172,7 +172,7 @@ def getqrcode(geticket, session):
     :param geticket: geticket()函数返回的ticket
     :return: 包含二维码base64编码和uuid的列表
     """
-    appid = 'wx20976a32c7a2fd75'
+    appid = ''
     noncestr = str(uuid.uuid4())
     timestamp = int(time.time())
     sdk_ticket = geticket
