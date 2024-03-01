@@ -25,6 +25,4 @@ git clone --depth=1 https://hub.fastgit.xyz/nashor1/fuck_LM.git
 安装所需依赖
 pip install -r requestment.txt
 
-安装完后执行运行文件app.py
-之后访问ip:5000端口即可
-阳光跑和早操签到后缀与本地搭建一致
+使用gunicorn框架搭建，即可实现公网部署
